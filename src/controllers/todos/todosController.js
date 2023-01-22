@@ -25,27 +25,31 @@ const createTodo = async function (req, res, error) {
 
 const getTodos = async function (req, res, next) {
   // /todos/:todoId, /todos?limit=10,last=<last todoid>, /user/:userId/todos/:todoId
-  console.log({ params: req.params, locals: req.locals });
-  const otherUserId = req.params.userId;
-  const todoId = req.params.todoId;
-  let { last, limit } = req.locals;
-  let filterCondition = {};
-  if (otherUserId) {
-    filterCondition = { ...filterCondition, userId: otherUserId };
-  } else {
-    filterCondition = { ...filterCondition, userId: req.userId };
-  }
-  if (last) {
-    filterCondition = { ...filterCondition, _id: { $gt: last } };
-  }
-  if (todoId) {
-    filterCondition = { ...filterCondition, _id: { $gt: todoId } };
-  }
+  try {
+    console.log({ params: req.params, locals: req.locals });
+    const otherUserId = req.params.userId;
+    const todoId = req.params.todoId;
+    let { last, limit } = req.locals;
+    let filterCondition = {};
+    if (otherUserId) {
+      filterCondition = { ...filterCondition, userId: otherUserId };
+    } else {
+      filterCondition = { ...filterCondition, userId: req.userId };
+    }
+    if (last) {
+      filterCondition = { ...filterCondition, _id: { $gt: last } };
+    }
+    if (todoId) {
+      filterCondition = { ...filterCondition, _id: { $gt: todoId } };
+    }
 
-  const todos = await getTodosService({ ...filterCondition }, { limit });
-  last = todos[todos.length - 1]._id;
-  console.log(typeof todos);
-  return res.send({ size: todos.length, todos, last });
+    const todos = await getTodosService({ ...filterCondition }, { limit });
+    if (todos.length > 0) last = todos[todos.length - 1]._id;
+    console.log(typeof todos);
+    return res.send({ size: todos.length, todos, last });
+  } catch (err) {
+    next(err);
+  }
 };
 
 const deleteTodo = async function (req, res, next) {

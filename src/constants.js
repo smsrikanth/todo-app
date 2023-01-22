@@ -9,6 +9,7 @@ const CONSTANTS = {
   USER_CREATED_SUCCESS: 'User created successfully',
   LOGIN_SUCCESS: 'User login success',
   USER_SIGN_UP_SUCCESS: 'User sign up success',
+  LOGOUT_SUCCESS: 'Logout success',
   SIGN_IN_TOKEN_FAILURE: 'Could not sign token',
   TOKEN_REQUIRED_FAILURE: 'Token is required, Please login again',
   TOKEN_VERIFY_FAILURE: 'Could not verify token',

@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieSession from 'cookie-session';
+import dotenv from 'dotenv';
 import cors from 'cors';
 import dbConnection from './src/db/index.js';
 import userRoutes from './src/routes/user/userRoutes.js';
@@ -10,6 +11,7 @@ import authRoutes from './src/routes/auth/index.js';
 
 const app = express();
 const port = 3000;
+dotenv.config();
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));

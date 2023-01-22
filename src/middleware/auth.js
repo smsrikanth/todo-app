@@ -11,10 +11,11 @@ const authenticate = async function (req, res) {
       password: await encryptPassword(password),
     });
     if (user) {
+      console.log(process.NODE_ENV);
       jwt.sign(
         { email: user.email, userId: user._id },
-        'test', // TODO
-        { expiresIn: 5 }, // TODO
+        process.env.SESSION_SECRET, // TODO
+        { expiresIn: process.env.SESSION_TOKEN_EXPIRES_IN }, // TODO
         (err, token) => {
           if (!err) {
             req.session.token = token;
@@ -23,6 +24,7 @@ const authenticate = async function (req, res) {
             res.status(400).send({
               message: CONSTANTS.SIGN_IN_TOKEN_FAILURE,
             });
+            next(err);
           }
         }
       );
@@ -30,6 +32,7 @@ const authenticate = async function (req, res) {
       res.status(400).send({
         message: CONSTANTS.USERNAME_OR_PASSWORD_INCORRECT_FAILURE,
       });
+      next(err);
     }
   } catch (err) {}
 };
@@ -39,7 +42,7 @@ const verifyToken = async (req, res, next) => {
   if (!token) {
     return res.status(403).send({ message: CONSTANTS.TOKEN_REQUIRED_FAILURE });
   }
-  jwt.verify(token, 'test', (err, decoded) => {
+  jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
     if (!err) {
       req.userId = decoded.userId;
       next();
@@ -110,4 +113,16 @@ const pagination = async function (req, res, next) {
   }
 };
 
-export { authenticate, verifyToken, verifySignUp, pagination };
+const logout = async function (req, res) {
+  try {
+    if (req.session) {
+      req.session = null;
+      req.locals = null;
+    }
+    return res.send({ message: CONSTANTS.LOGOUT_SUCCESS });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { authenticate, verifyToken, verifySignUp, pagination, logout };
