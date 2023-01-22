@@ -2,6 +2,7 @@ import {
   createTodoService,
   deleteTodoService,
   updateTodoService,
+  getTodosService,
 } from '../../services/todoServices.js';
 import CONSTANTS from '../../constants.js';
 import Todos from '../../models/todo.js';
@@ -23,21 +24,28 @@ const createTodo = async function (req, res, error) {
 };
 
 const getTodos = async function (req, res, next) {
-  console.log({ params: req.params });
+  // /todos/:todoId, /todos?limit=10,last=<last todoid>, /user/:userId/todos/:todoId
+  console.log({ params: req.params, locals: req.locals });
   const otherUserId = req.params.userId;
   const todoId = req.params.todoId;
+  let { last, limit } = req.locals;
   let filterCondition = {};
   if (otherUserId) {
     filterCondition = { ...filterCondition, userId: otherUserId };
   } else {
     filterCondition = { ...filterCondition, userId: req.userId };
   }
-  if (todoId) {
-    filterCondition = { ...filterCondition, _id: todoId };
+  if (last) {
+    filterCondition = { ...filterCondition, _id: { $gt: last } };
   }
-  const todos = [...(await Todos.find({ ...filterCondition }))];
+  if (todoId) {
+    filterCondition = { ...filterCondition, _id: { $gt: todoId } };
+  }
+
+  const todos = await getTodosService({ ...filterCondition }, { limit });
+  last = todos[todos.length - 1]._id;
   console.log(typeof todos);
-  return res.send({ size: todos.length, todos });
+  return res.send({ size: todos.length, todos, last });
 };
 
 const deleteTodo = async function (req, res, next) {

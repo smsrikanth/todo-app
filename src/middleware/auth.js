@@ -91,4 +91,23 @@ const encryptPassword = async (password) => {
   return password;
 };
 
-export { authenticate, verifyToken, verifySignUp };
+const pagination = async function (req, res, next) {
+  try {
+    const { limit = 10, last } = req.query;
+    req.locals = {
+      limit,
+    };
+    if (last) {
+      req.locals = {
+        ...req.locals,
+        last,
+      };
+    }
+    console.log(req.locals);
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { authenticate, verifyToken, verifySignUp, pagination };

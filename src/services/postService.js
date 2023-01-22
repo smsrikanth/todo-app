@@ -24,17 +24,20 @@ const addCommentToAPostService = async function (comment) {
 };
 
 const getCommentsForAPostService = async function (postId) {
-  const query = {
-    $lookup: {
-      from: 'comments',
-      localField: '_id',
-      foreignField: 'postId',
-      as: 'comments',
+  const aggregateCondition = [
+    { $addFields: { postId: { $toString: '$_id' } } },
+    {
+      $lookup: {
+        from: 'comments',
+        localField: 'postId',
+        foreignField: 'postId',
+        as: 'comments',
+      },
     },
-  };
-  const post = await Post.aggregate([query]);
+  ];
+  const post = await Post.aggregate(aggregateCondition);
 
-  console.log({ post });
+  console.log({ post, a: 'c' });
   return post;
 };
 

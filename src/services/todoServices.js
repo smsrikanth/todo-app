@@ -18,4 +18,13 @@ const updateTodoService = async function (todoId, todo) {
   return rec;
 };
 
-export { createTodoService, deleteTodoService, updateTodoService };
+const getTodosService = async function (filterCondition, options) {
+  return [...(await Todo.find({ ...filterCondition }, null, { ...options }))];
+};
+
+export {
+  createTodoService,
+  deleteTodoService,
+  updateTodoService,
+  getTodosService,
+};
