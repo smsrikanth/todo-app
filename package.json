@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm test",
     "start:dev": "nodemon app.js ",
-    "start": "pm2 start app.js",
+    "start": "rm -rf node_modules &&  npm install && pm2 start app.js",
     "format": "prettier --write \"src/**/*.{ts,js,jsx,css,json}\""
   },
   "type": "module",
