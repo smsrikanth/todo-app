@@ -2,11 +2,11 @@
   "name": "todo-app",
   "version": "1.0.0",
   "description": "Todo App",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "test": "npm test",
-    "start:dev": "nodemon app.js ",
-    "start": "rm -rf node_modules &&  npm install && pm2 start app.js",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --testTimeout=15000",
+    "start:dev": "nodemon server.js ",
+    "start": "rm -rf node_modules &&  npm install && pm2 start server.js",
     "format": "prettier --write \"src/**/*.{ts,js,jsx,css,json}\""
   },
   "type": "module",
@@ -17,6 +17,7 @@
     "body-parser": "^1.20.1",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
@@ -25,6 +26,18 @@
     "pm2": "^5.2.2"
   },
   "devDependencies": {
-    "prettier": "2.8.3"
+    "babel-jest": "^29.3.1",
+    "jest": "^29.3.1",
+    "prettier": "2.8.3",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
   }
 }

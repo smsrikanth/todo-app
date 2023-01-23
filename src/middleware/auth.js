@@ -5,13 +5,22 @@ import User from '../models/user.js';
 const authenticate = async function (req, res) {
   try {
     const { email, password } = req.body;
-    console.log({ body: req.body });
+    if (!email) {
+      return res
+        .status(400)
+        .send({ message: CONSTANTS.EMAIL_REQUIRED_FAILURE });
+    }
+    if (!password) {
+      return res
+        .status(400)
+        .send({ message: CONSTANTS.PASSWORD_REQUIRED_FAILURE });
+    }
     const user = await User.findOne({
       email,
       password: await encryptPassword(password),
     });
     if (user) {
-      console.log(process.NODE_ENV);
+      // console.log(process.NODE_ENV);
       jwt.sign(
         { email: user.email, userId: user._id },
         process.env.SESSION_SECRET, // TODO
@@ -43,6 +52,7 @@ const verifyToken = async (req, res, next) => {
     return res.status(403).send({ message: CONSTANTS.TOKEN_REQUIRED_FAILURE });
   }
   jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
+    // console.log({ err, decoded });
     if (!err) {
       req.userId = decoded.userId;
       next();
@@ -55,7 +65,7 @@ const verifyToken = async (req, res, next) => {
   });
 };
 
-const verifySignUp = async (req, res) => {
+const signUp = async (req, res) => {
   try {
     const { username, password, roles, email } = req.body;
     if (!username) {
@@ -81,12 +91,12 @@ const verifySignUp = async (req, res) => {
       });
     }
     const user = new User({ username, password, email });
-    console.log({ user });
+    // console.log({ user });
     await user.save();
-    res.send({ message: CONSTANTS.USER_SIGN_UP_SUCCESS });
+    res.status(202).send({ message: CONSTANTS.USER_SIGN_UP_SUCCESS });
   } catch (err) {
     res.status(500).send({ message: CONSTANTS.SIGN_UP_FAILURE });
-    console.log(err);
+    // console.log(err);
   }
 };
 
@@ -106,7 +116,7 @@ const pagination = async function (req, res, next) {
         last,
       };
     }
-    console.log(req.locals);
+    // console.log(req.locals);
     next();
   } catch (err) {
     next(err);
@@ -125,4 +135,4 @@ const logout = async function (req, res) {
   }
 };
 
-export { authenticate, verifyToken, verifySignUp, pagination, logout };
+export { authenticate, verifyToken, signUp, pagination, logout };

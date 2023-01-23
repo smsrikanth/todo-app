@@ -5,8 +5,9 @@ const createPostService = async function (post) {
   await post.save();
 };
 
-const deletePostService = async function (todoId) {
-  await Post.deleteOne({ _id: todoId });
+const deletePostService = async function (postId) {
+  await Comment.deleteMany({ postId });
+  await Post.deleteOne({ _id: postId });
 };
 
 const updatePostService = async function (todoId, post) {
@@ -15,7 +16,7 @@ const updatePostService = async function (todoId, post) {
   };
   const condition = { _id: todoId };
   const rec = await Post.findOneAndUpdate(condition, { ...post }, options);
-  console.log({ rec });
+  // console.log({ rec });
   return rec;
 };
 
@@ -26,6 +27,7 @@ const addCommentToAPostService = async function (comment) {
 const getCommentsForAPostService = async function (postId) {
   const aggregateCondition = [
     { $addFields: { postId: { $toString: '$_id' } } },
+    { $match: { postId } },
     {
       $lookup: {
         from: 'comments',
@@ -37,8 +39,12 @@ const getCommentsForAPostService = async function (postId) {
   ];
   const post = await Post.aggregate(aggregateCondition);
 
-  console.log({ post, a: 'c' });
+  // console.log({ post, a: 'c' });
   return post;
+};
+
+const getPostsService = async function (filterCondition, options) {
+  return [...(await Post.find({ ...filterCondition }, null, { ...options }))];
 };
 
 export {
@@ -47,4 +53,5 @@ export {
   updatePostService,
   addCommentToAPostService,
   getCommentsForAPostService,
+  getPostsService,
 };

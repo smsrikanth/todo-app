@@ -6,6 +6,7 @@ const todoAuthorize = async (req, res, next) => {
   try {
     const { todoId } = req.params;
     const todo = await Todos.findOne({ _id: todoId });
+    // console.log(todo.userId, req.userId, req.userId === todo.userId);
     if (!todo) {
       res.status(404).send({ message: CONSTANTS.TODO_DOES_NOT_EXIST });
     }

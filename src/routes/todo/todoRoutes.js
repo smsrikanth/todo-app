@@ -9,7 +9,7 @@ import { verifyToken, pagination } from '../../middleware/auth.js';
 import { todoAuthorize } from '../../middleware/authorisation.js';
 
 const router = express.Router({ mergeParams: true });
-//     console.log(req.path, req.params);
+//     // console.log(req.path, req.params);
 router.use('/', verifyToken);
 router.post('/', createTodo);
 router.get('/', pagination, getTodos);

@@ -14,7 +14,7 @@ const updateTodoService = async function (todoId, todo) {
   };
   const condition = { _id: todoId };
   const rec = await Todo.findOneAndUpdate(condition, { ...todo }, options);
-  console.log({ rec });
+  // console.log({ rec });
   return rec;
 };
 

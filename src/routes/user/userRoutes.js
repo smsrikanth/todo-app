@@ -18,7 +18,7 @@ router.use(
         JSON.stringify({ message: ' UnAuthorised!! ', status: 403 })
       );
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       next(err);
     }
   },

@@ -4,6 +4,7 @@ import {
   updatePostService,
   addCommentToAPostService,
   getCommentsForAPostService,
+  getPostsService,
 } from '../../services/postService.js';
 import CONSTANTS from '../../constants.js';
 import Posts from '../../models/post.js';
@@ -11,7 +12,7 @@ import Comment from '../../models/comment.js';
 
 const createPost = async function (req, res, error) {
   try {
-    console.log('create Post controller');
+    // console.log('create Post controller');
     const post = new Posts();
     const { title, body } = req.body;
     if (!title) {
@@ -23,32 +24,36 @@ const createPost = async function (req, res, error) {
     post.title = title;
     post.body = body;
     post.userId = req.userId;
-    console.log(req.userId);
+    // console.log(req.userId);
     await createPostService(post);
     return res.json({ message: CONSTANTS.POST_CREATED_SUCCESS });
   } catch (err) {
     res.status(400).send({ msg: `${err._message}` });
-    console.log(err);
+    // console.log(err);
   }
 };
 
 const getPosts = async function (req, res, next) {
   try {
-    console.log('Get Posts');
-    console.log({ params: req.params });
+    // console.log('Get Posts');
+    // console.log({ params: req.params });
     const otherUserId = req.params.userId;
     const postId = req.params.postId;
+    let { last, limit } = req.locals;
     let filterCondition = {};
     if (otherUserId) {
       filterCondition = { ...filterCondition, userId: otherUserId };
     } else {
       filterCondition = { ...filterCondition, userId: req.userId };
     }
+    if (last) {
+      filterCondition = { ...filterCondition, _id: { $gt: last } };
+    }
     if (postId) {
       filterCondition = { ...filterCondition, _id: postId };
     }
-    const posts = [...(await Posts.find({ ...filterCondition }))];
-    console.log(typeof posts);
+    const posts = await getPostsService({ ...filterCondition }, { limit });
+    // console.log(typeof posts);
     return res.send({ size: posts.length, posts });
   } catch (err) {
     next(err);
@@ -57,7 +62,6 @@ const getPosts = async function (req, res, next) {
 
 const deletePost = async function (req, res, next) {
   try {
-    console.log('Delete Post');
     const { postId } = req.params;
     const record = await deletePostService(postId);
     res.json({ message: CONSTANTS.POST_DELETED_SUCCESS, record });
@@ -68,7 +72,7 @@ const deletePost = async function (req, res, next) {
 
 const updatePost = async function (req, res, next) {
   try {
-    console.log('Update Post');
+    // console.log('Update Post');
     const { postId } = req.params;
     const record = await updatePostService(postId, req.body);
     res.json({ message: CONSTANTS.POST_UPDATED_SUCCESS, record });
@@ -80,7 +84,7 @@ const updatePost = async function (req, res, next) {
 
 const addComment = async function (req, res, next) {
   try {
-    console.log('Add comment');
+    // console.log('Add comment');
     const { postId } = req.params;
     const post = await Posts.findOne({ _id: postId });
     if (!post) {
@@ -96,7 +100,7 @@ const addComment = async function (req, res, next) {
     comment.postId = postId;
     comment.userId = req.userId;
     comment.body = body;
-    console.log({ comment });
+    // console.log({ comment });
     await addCommentToAPostService(comment);
     res.send({ message: 'Comment Added Successfully' });
   } catch (err) {
@@ -107,7 +111,8 @@ const addComment = async function (req, res, next) {
 
 const getCommentsForAPost = async function (req, res, next) {
   try {
-    const post = await getCommentsForAPostService();
+    const { postId } = req.params;
+    const post = await getCommentsForAPostService(postId);
     res.send({ post });
   } catch (err) {
     next(err);

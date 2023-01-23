@@ -26,6 +26,7 @@ const CONSTANTS = {
   UNAUTHORISED: 'Unauthorized, cannot perform this action',
   SOMETHING_WENT_WRONG: 'Something went wrong',
   REQUIRED_FAILURE: 'is required',
+  TITLE_REQUIRED_FAILURE: 'Todo Title required',
 };
 
 export default CONSTANTS;
